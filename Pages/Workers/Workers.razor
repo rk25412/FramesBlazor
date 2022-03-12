@@ -8,7 +8,7 @@
 </div>
 
 <RadzenCard class="w-100">
-    <RadzenDataGrid AllowFiltering="true" @ref=@grid AllowColumnResize="true" FilterMode="FilterMode.SimpleWithMenu"
+    <RadzenDataGrid AllowFiltering="true" @ref=@grid AllowColumnResize="true" FilterMode="FilterMode.Advanced"
                     AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" Count=@count
                     IsLoading=@isLoading ShowPagingSummary="true" Data=@WorkersList LogicalFilterOperator="LogicalFilterOperator.Or"
                     LoadData=@LoadData FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">

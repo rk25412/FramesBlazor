@@ -16,6 +16,8 @@ builder.Services.AddScoped<ContextMenuService>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.RegisterDbContext(builder.Configuration);
+
+// Added Services
 builder.Services.AddScoped<IWorkerService, WorkerService>();
 builder.Services.AddScoped<IAdminFrameService, AdminFrameService>();
 

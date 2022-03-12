@@ -1,0 +1,71 @@
+﻿@page "/admin/framesin"
+
+@inject IAdminFrameService adminFrameService
+@inject DialogService DialogService
+
+<PageTitle>Master Frames In</PageTitle>
+
+<div class="d-flex justify-content-between mx-2">
+    <h1>Master Frames In</h1>
+    <RadzenButton Text="Add New" />
+</div>
+
+
+<RadzenCard class="w-100">
+    <RadzenDataGrid @ref=@grid AllowColumnResize="true" PageSize="31" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+                    Count=@count IsLoading=@isLoading ShowPagingSummary="true" Data=@framesInGroupedData
+                    LogicalFilterOperator="LogicalFilterOperator.Or" LoadData=@LoadData>
+        <Columns>
+            <RadzenDataGridColumn TItem="FramesInGroupedData" Title="Action" Width="100px"
+                                  TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" />
+                    <RadzenButton Icon="launch" ButtonStyle="ButtonStyle.Secondary" />
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="FramesInGroupedData" Property="Date" Width="100px" Title="Date" TextAlign="TextAlign.Center" />
+
+            @foreach (var i in Enumerable.Range(1, maxColumnCount))
+            {
+                <RadzenDataGridColumn TItem="FramesInGroupedData" Property="Date" Title=@($"Round {i}") TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        @if (i <= data.SubData.Count())
+                        {
+                            @($"{data.SubData[i - 1].time} - {data.SubData[i - 1].NoOfFrames}")
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+            }
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+@code {
+    //IEnumerable<AdminFramesIn> adminFramesIn;
+    IEnumerable<FramesInGroupedData> framesInGroupedData = default!;
+    RadzenDataGrid<FramesInGroupedData> grid = default!;
+
+    bool isLoading;
+    int count;
+    int maxColumnCount;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        var query = await adminFrameService.GetAllAdminFramesIn(new Query { OrderBy = "Date" });
+        await Task.Yield();
+
+        framesInGroupedData = GlobalFunctions.GetGroupedDataFromAdminFramesIn(query.ToList());
+
+        count = framesInGroupedData.Count();
+
+        maxColumnCount = framesInGroupedData.Max(x => x.SubData.Count());
+
+        isLoading = false;
+    }
+}
