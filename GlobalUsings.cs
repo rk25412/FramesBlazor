@@ -7,3 +7,4 @@ global using Radzen;
 global using Radzen.Blazor;
 global using FramesBlazor.Contracts;
 global using System.Linq.Dynamic.Core;
+global using Microsoft.AspNetCore.Components;

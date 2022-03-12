@@ -1,0 +1,70 @@
+﻿@page "/workers"
+
+<PageTitle>Workers</PageTitle>
+
+<div class="d-flex justify-content-between mx-2">
+    <h1>Workers</h1>
+    <RadzenButton Text="Add New" Click=@(_ => ShowAddEditWorkerDialog()) />
+</div>
+
+<RadzenCard class="w-100">
+    <RadzenDataGrid AllowFiltering="true" @ref=@grid AllowColumnResize="true" FilterMode="FilterMode.SimpleWithMenu"
+                    AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" Count=@count
+                    IsLoading=@isLoading ShowPagingSummary="true" Data=@WorkersList LogicalFilterOperator="LogicalFilterOperator.Or"
+                    LoadData=@LoadData FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+        <Columns>
+            <RadzenDataGridColumn TItem="Worker" Property="Id" Filterable="false" Title="ID" Width="200px"
+                                  TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="Worker" Property="Name" Filterable="true" Title="Name"
+                                  TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="Worker" Sortable="false" Filterable="false" Title="Action" Width="200px"
+                                  TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    <RadzenButton Icon="launch" ButtonStyle="ButtonStyle.Secondary"
+                                  Click="_ => ShowAddEditWorkerDialog(data.Id)" />
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                                  Click="_ => DeleteWorker(data.Id, data.Name)" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+
+@code {
+    async Task ShowAddEditWorkerDialog(int workerId = 0)
+    {
+        if (workerId is 0)
+            worker = new();
+        else
+            worker = await workerService.GetWorker(workerId, null);
+
+        var result = await DialogService.OpenAsync("Add New Worker", ds =>
+    @<div>
+        <div class="col">
+            <RadzenTemplateForm Data="@worker" Submit=@(async (Worker args) => { 
+                if (workerId is 0) 
+                    await workerService.AddWorker(args);
+                else
+                    await workerService.UpdateWorker(args);
+                    await grid.Reload();
+                    ds.Close(true);
+            })>
+                <RadzenLabel Text="Name" />
+                <RadzenTextBox Placeholder="Enter new Worker Name" @bind-Value="worker.Name" class="w-100"
+                           Name="Worker_Name" />
+                <RadzenRequiredValidator Component="Worker_Name" Text="First Name is required" />
+                <div class="my-2 d-flex justify-content-end">
+                    <RadzenButton Text="Cancel" class="ms-2" ButtonStyle="ButtonStyle.Light" Click="() => {
+                        worker = new();
+                        ds.Close(false);
+                    }" />
+                    <RadzenButton Text="Save" class="ms-2" ButtonStyle="ButtonStyle.Primary"
+                              ButtonType="ButtonType.Submit" />
+                </div>
+            </RadzenTemplateForm>
+        </div>
+    </div>
+    );
+    }
+}

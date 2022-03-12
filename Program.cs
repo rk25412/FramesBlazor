@@ -1,5 +1,5 @@
 using FramesBlazor.Extensions;
-using Radzen;
+using FramesBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +16,8 @@ builder.Services.AddScoped<ContextMenuService>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.RegisterDbContext(builder.Configuration);
+builder.Services.AddScoped<IWorkerService, WorkerService>();
+builder.Services.AddScoped<IAdminFrameService, AdminFrameService>();
 
 var app = builder.Build();
 
@@ -33,5 +35,7 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+SeedData.EnsurePopulated(app);
 
 app.Run();
